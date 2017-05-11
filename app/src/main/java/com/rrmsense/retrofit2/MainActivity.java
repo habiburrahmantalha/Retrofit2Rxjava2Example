@@ -7,25 +7,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String BASE_URL = "http://www.rrmelectronics.com/";
+
 
     @BindView(R.id.et_user_name)
     EditText etUserName;
@@ -49,23 +40,10 @@ public class MainActivity extends AppCompatActivity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.button_login:
-
-                //UserT userT = new UserT(etUserName.getText().toString(), etPassword.getText().toString());
                 User user = User.builder().userName(etUserName.getText().toString()).password(etPassword.getText().toString()).build();
 
-                Gson gson = new GsonBuilder()
-                        .setLenient()
-                        .create();
+                RequestInterface requestInterface = RetrofitApiClient.getClient().create(RequestInterface.class);
 
-                GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(
-                        new GsonBuilder().registerTypeAdapterFactory(AutoValueGsonFactory.create()).setLenient()
-                                .create());
-
-                RequestInterface requestInterface = new Retrofit.Builder()
-                        .baseUrl(BASE_URL)
-                        .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                        .addConverterFactory(gsonConverterFactory)
-                        .build().create(RequestInterface.class);
                 mCompositeDisposable.add(requestInterface.Login(user)
                 //mCompositeDisposable.add(requestInterface.Login(user.userName(),user.password())
                         .observeOn(AndroidSchedulers.mainThread())
