@@ -1,6 +1,8 @@
 package com.rrmsense.retrofit2;
 
 import com.google.auto.value.AutoValue;
+import com.google.gson.Gson;
+import com.google.gson.TypeAdapter;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -12,6 +14,7 @@ public abstract class User {
 
     @SerializedName("username")
     abstract String userName();
+    @SerializedName("password")
     abstract String password();
 
     public static User create(String userName, String password) {
@@ -35,4 +38,9 @@ public abstract class User {
 
         public abstract User build();
     }
+
+    public static TypeAdapter<User> typeAdapter(Gson gson) {
+        return new AutoValue_User.GsonTypeAdapter(gson);
+    }
+
 }

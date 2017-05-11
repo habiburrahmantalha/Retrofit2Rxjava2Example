@@ -50,19 +50,24 @@ public class MainActivity extends AppCompatActivity {
         switch (view.getId()) {
             case R.id.button_login:
 
-                UserT userT = new UserT(etUserName.getText().toString(), etPassword.getText().toString());
+                //UserT userT = new UserT(etUserName.getText().toString(), etPassword.getText().toString());
+                User user = User.builder().userName(etUserName.getText().toString()).password(etPassword.getText().toString()).build();
 
                 Gson gson = new GsonBuilder()
                         .setLenient()
                         .create();
 
+                GsonConverterFactory gsonConverterFactory = GsonConverterFactory.create(
+                        new GsonBuilder().registerTypeAdapterFactory(AutoValueGsonFactory.create()).setLenient()
+                                .create());
+
                 RequestInterface requestInterface = new Retrofit.Builder()
                         .baseUrl(BASE_URL)
                         .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                        .addConverterFactory(GsonConverterFactory.create(gson))
+                        .addConverterFactory(gsonConverterFactory)
                         .build().create(RequestInterface.class);
-
-                mCompositeDisposable.add(requestInterface.Login(userT.getUserName(),userT.getPassword())
+                mCompositeDisposable.add(requestInterface.Login(user)
+                //mCompositeDisposable.add(requestInterface.Login(user.userName(),user.password())
                         .observeOn(AndroidSchedulers.mainThread())
                         .subscribeOn(Schedulers.io())
                         .subscribe(this::handleResponse,this::handleError));
@@ -70,8 +75,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void handleResponse(String response) {
-        Toast.makeText(this, "Success "+response, Toast.LENGTH_SHORT).show();
+    private void handleResponse(User response) {
+        Toast.makeText(this, "Success "+response.toString(), Toast.LENGTH_SHORT).show();
 
     }
 
